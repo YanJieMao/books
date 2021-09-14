@@ -217,7 +217,7 @@ const drawChartBook = async (subject, startIndex = 0) => {
           (volumeInfo.imageLinks.thumbnail === undefined
             ? "icons/logo.svg"
             : volumeInfo.imageLinks.thumbnail.replace("http://", "https://")) +
-          `' alt='cover'></a><div class='book-info'><h3 class='book-title'><a href='${volumeInfo.previewLink}' target='_blank'>${volumeInfo.title}</a></h3><div class='book-authors' style='display: inline-flex;align-items:center' onclick='updateFilter(this,"author");'><span>${volumeInfo.authors}</span><img style='margin-left:16px' src='https://img.shields.io/github/stars/wx-chevalier/${volumeInfo.repo}' /></div><div class='info' onclick='updateFilter(this,"subject");' style='background-color: ` +
+          `' alt='cover'></a><div class='book-info'><h3 class='book-title'><a href='${volumeInfo.previewLink}' target='_blank'>${volumeInfo.title}</a></h3><div class='book-authors' style='display: inline-flex;align-items:center' onclick='updateFilter(this,"author");'><span>${volumeInfo.authors}</span><img style='margin-left:16px' src='https://img.shields.io/github/stars/yanjiemao/${volumeInfo.repo}' /></div><div class='info' onclick='updateFilter(this,"subject");' style='background-color: ` +
           getRandomColor() +
           `;'>` +
           (volumeInfo.categories === undefined
