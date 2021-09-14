@@ -1,34 +1,211 @@
 let bookContainer = document.querySelector(".search");
 let searchBooks = document.getElementById("search-box");
-const getBooks = async (book) => {
-  const response = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${book}`
-  );
-  const data = await response.json();
-  return data;
+
+/** @start 添加元素 */
+[
+  
+  
+  { id: "cloud", title: "云原生、k8s、服务网格、监控", icon: "" },
+  //{ id: "front", title: "vue、react、javascript", icon: "" },
+  { id: "backend", title: "服务端、微服务、数据库、高可用、Spring", icon: "" },
+  
+  
+  
+].forEach(({ id, title, icon }) => {
+  document.addEventListener("DOMContentLoaded", () => {
+    drawChartBook(id);
+  });
+
+  document.querySelector("#foryou").innerHTML =
+    document.querySelector("#foryou").innerHTML +
+    `
+      <section id=${id} class="results">
+        <div class="flex">
+          <h1 class="section-title">${title}</h1>
+          <div>
+            <button id="${id}-prev" class="pagination prev" onclick="prev('${id}')">◀</button>
+            <button id="${id}-next" class="pagination next" onclick="next('${id}')">▶</button>
+          </div>
+        </div>
+        <div class="list-book ${id} categories">
+          <div class='prompt'>
+            <div class="loader"></div>
+          </div>
+        </div>
+        <div class="fade left"></div>
+        <div class="fade right"></div>
+      </section>
+  `;
+});
+
+/** @end 添加元素 */
+
+function randomIntFromInterval(min, max) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+const getCover = (title) => {
+  return `https://orly-appstore.herokuapp.com/generate?title=${title}&top_text=Just%20Coder&author=awesome&image_code=${randomIntFromInterval(
+    1,
+    40
+  )}&theme=${randomIntFromInterval(
+    0,
+    16
+  )}&guide_text=&guide_text_placement=bottom_right`;
 };
 
-const extractThumbnail = ({ imageLinks }) => {
-  const DEFAULT_THUMBNAIL = "icons/logo.svg";
-  if (!imageLinks || !imageLinks.thumbnail) {
-    return DEFAULT_THUMBNAIL;
+/** 执行书籍抓取 */
+const getBooks = async (book) => {
+  let data = [];
+
+  switch (book) {
+
+
+    case "cloud": {
+      data = [
+        {
+          volumeInfo: {
+            title: "istio服务网格进阶实战",
+            repo: "istio-handbook",
+            previewLink: "https://www.jianso.tech/istio-handbook/",
+            imageLinks: {
+              thumbnail: getCover("istio服务网格进阶实战"),
+            },
+            categories: ["istio", "服务网格"],
+          },
+        },
+        {
+          volumeInfo: {
+            title: "k8s中文指南",
+            repo: "k8s-handbook",
+            previewLink: "https://www.jianso.tech/k8s-handbook/",
+            imageLinks: {
+              thumbnail: getCover("k8s中文指南"),
+            },
+            categories: ["k8s"],
+          },
+        }
+      
+      ]
+       
+      break;
+    }
+    
+    case "backend": {
+      data = [
+        {
+          volumeInfo: {
+            title: "软件架构设计",
+            repo: "SoftwareArchitecture-Series",
+            previewLink: "https://ng-tech.icu/SoftwareArchitecture-Series/",
+            imageLinks: {
+              thumbnail: getCover("Software Architecture"),
+            },
+            categories: ["风格与模式", "复杂性与设计原则", "架构设计方式"],
+          },
+        },
+        {
+          volumeInfo: {
+            title: "服务端功能域",
+            repo: "Backend-Series",
+            previewLink: "https://ng-tech.icu/Backend-Series/",
+            imageLinks: {
+              thumbnail: getCover("Backend Series"),
+            },
+            categories: ["Backend"],
+          },
+        },
+
+        {
+          volumeInfo: {
+            title: "Spring 实战",
+            repo: "Spring-Series",
+            previewLink: "https://ng-tech.icu/Spring-Series/",
+            imageLinks: {
+              thumbnail: getCover("Spring Series"),
+            },
+            categories: ["Spring", "Spring Boot"],
+          },
+        },
+        {
+          volumeInfo: {
+            title: "数据库",
+            repo: "Database-Series",
+            previewLink: "https://ng-tech.icu/Database-Series/#/",
+            imageLinks: {
+              thumbnail: getCover("Database Series"),
+            },
+            categories: ["Middleware", "Database"],
+          },
+        },
+        {
+          volumeInfo: {
+            title: "MySQL 实战",
+            repo: "MySQL-Series",
+            previewLink: "https://ng-tech.icu/MySQL-Series/#/",
+            imageLinks: {
+              thumbnail: getCover("MySQL Series"),
+            },
+            categories: ["Middleware", "MySQL"],
+          },
+        },
+        {
+          volumeInfo: {
+            title: "微服务与云原生",
+            repo: "MicroCN-Series",
+            previewLink: "https://ng-tech.icu/MicroCN-Series/",
+            imageLinks: {
+              thumbnail: getCover("MicroService Series"),
+            },
+            categories: ["RPC", "接入网关", "配置中心", "权限隔离"],
+          },
+        },
+        {
+          volumeInfo: {
+            title: "测试与高可用保障",
+            repo: "HA-Series",
+            previewLink: "https://ng-tech.icu/HA-Series/",
+            imageLinks: {
+              thumbnail: getCover("测试与高可用保障"),
+            },
+            categories: ["Backend", "Test"],
+          },
+        },
+        {
+          volumeInfo: {
+            title: "软件工程：整洁与重构",
+            repo: "SoftwareEngineering-Series",
+            previewLink: "https://ng-tech.icu/SoftwareEngineering-Series/",
+            imageLinks: {
+              thumbnail: getCover("Refactor"),
+            },
+            categories: ["Software Engineering", "Refactor"],
+          },
+        },
+      ];
+      break;
+    }
+
   }
-  return imageLinks.thumbnail.replace("http://", "https://");
+
+  data.forEach((d) => {
+    d.volumeInfo.authors = ["awesome"];
+  });
+
+  return { totalItems: data.length, items: data };
 };
+
 const drawChartBook = async (subject, startIndex = 0) => {
   let cbookContainer = document.querySelector(`.${subject}`);
   cbookContainer.innerHTML = `<div class='prompt'><div class="loader"></div></div>`;
-  const cdata = await getBooks(
-    `subject:${subject}&startIndex=${startIndex}&maxResults=6`
-  );
+  const cdata = await getBooks(subject);
   if (cdata.error) {
     cbookContainer.innerHTML = `<div class='prompt'>ツ Limit exceeded! Try after some time</div>`;
   } else if (cdata.totalItems == 0) {
     cbookContainer.innerHTML = `<div class='prompt'>ツ No results, try a different term!</div>`;
   } else if (cdata.totalItems == undefined) {
     cbookContainer.innerHTML = `<div class='prompt'>ツ Network problem!</div>`;
-  } else if (!cdata.items || cdata.items.length == 0) {
-    cbookContainer.innerHTML = `<div class='prompt'>ツ There is no more result!</div>`;
   } else {
     cbookContainer.innerHTML = cdata.items;
     cbookContainer.innerHTML = cdata.items
@@ -37,8 +214,10 @@ const drawChartBook = async (subject, startIndex = 0) => {
           `<div class='book' style='background: linear-gradient(` +
           getRandomColor() +
           `, rgba(0, 0, 0, 0));'><a href='${volumeInfo.previewLink}' target='_blank'><img class='thumbnail' src='` +
-          extractThumbnail(volumeInfo) +
-          `' alt='cover'></a><div class='book-info'><h3 class='book-title'><a href='${volumeInfo.previewLink}' target='_blank'>${volumeInfo.title}</a></h3><div class='book-authors' onclick='updateFilter(this,"author");'>${volumeInfo.authors}</div><div class='info' onclick='updateFilter(this,"subject");' style='background-color: ` +
+          (volumeInfo.imageLinks.thumbnail === undefined
+            ? "icons/logo.svg"
+            : volumeInfo.imageLinks.thumbnail.replace("http://", "https://")) +
+          `' alt='cover'></a><div class='book-info'><h3 class='book-title'><a href='${volumeInfo.previewLink}' target='_blank'>${volumeInfo.title}</a></h3><div class='book-authors' style='display: inline-flex;align-items:center' onclick='updateFilter(this,"author");'><span>${volumeInfo.authors}</span><img style='margin-left:16px' src='https://img.shields.io/github/stars/wx-chevalier/${volumeInfo.repo}' /></div><div class='info' onclick='updateFilter(this,"subject");' style='background-color: ` +
           getRandomColor() +
           `;'>` +
           (volumeInfo.categories === undefined
@@ -49,6 +228,7 @@ const drawChartBook = async (subject, startIndex = 0) => {
       .join("");
   }
 };
+
 const drawListBook = async () => {
   if (searchBooks.value != "") {
     bookContainer.style.display = "flex";
@@ -67,7 +247,12 @@ const drawListBook = async () => {
             `<div class='book' style='background: linear-gradient(` +
             getRandomColor() +
             `, rgba(0, 0, 0, 0));'><a href='${volumeInfo.previewLink}' target='_blank'><img class='thumbnail' src='` +
-            extractThumbnail(volumeInfo) +
+            (volumeInfo.imageLinks.thumbnail === undefined
+              ? "icons/logo.svg"
+              : volumeInfo.imageLinks.thumbnail.replace(
+                  "http://",
+                  "https://"
+                )) +
             `' alt='cover'></a><div class='book-info'><h3 class='book-title'><a href='${volumeInfo.previewLink}' target='_blank'>${volumeInfo.title}</a></h3><div class='book-authors' onclick='updateFilter(this,"author");'>${volumeInfo.authors}</div><div class='info' onclick='updateFilter(this,"subject");' style='background-color: ` +
             getRandomColor() +
             `;'>` +
@@ -101,22 +286,22 @@ const updateFilter = ({ innerHTML }, f) => {
 const debounce = (fn, time, to = 0) => {
   to ? clearTimeout(to) : (to = setTimeout(drawListBook, time));
 };
-searchBooks.addEventListener("input", () => debounce(drawListBook, 1000));
-document.addEventListener("DOMContentLoaded", () => {
-  drawChartBook("love");
-  drawChartBook("feminism");
-  drawChartBook("inspirational");
-  drawChartBook("authors");
-  drawChartBook("fiction");
-  drawChartBook("poetry");
-  drawChartBook("fantasy");
-  drawChartBook("romance");
-});
+
+// searchBooks.addEventListener("input", () => debounce(drawListBook, 1000));
+/* searchBooks.addEventListener("click", function name(params) {
+  window.location.href = "/search";
+}); */
+
 let mainNavLinks = document.querySelectorAll(".scrolltoview");
 window.addEventListener("scroll", (event) => {
   let fromTop = window.scrollY + 64;
   mainNavLinks.forEach(({ hash, classList }) => {
+    if (!hash) {
+      return;
+    }
+
     let section = document.querySelector(hash);
+
     if (
       section.offsetTop <= fromTop &&
       section.offsetTop + section.offsetHeight > fromTop
@@ -184,18 +369,7 @@ const prev = (subject) => {
     drawChartBook(subject, startIndex);
   }
 };
-const modal = document.querySelector(".modal");
-const trigger = document.querySelector(".trigger");
-const closeButton = document.querySelector(".close-button");
-const toggleModal = () => modal.classList.toggle("show-modal");
-const windowOnClick = ({ target }) => {
-  if (target === modal) {
-    toggleModal();
-  }
-};
-trigger.addEventListener("click", toggleModal);
-closeButton.addEventListener("click", toggleModal);
-window.addEventListener("click", windowOnClick);
+
 let pwaInstalled = localStorage.getItem("pwaInstalled") == "yes";
 if (window.matchMedia("(display-mode: standalone)").matches) {
   localStorage.setItem("pwaInstalled", "yes");
@@ -232,3 +406,4 @@ window.addEventListener("appinstalled", (evt) => {
   pwaInstalled = true;
   document.getElementById("installPWA").style.display = "none";
 });
+
